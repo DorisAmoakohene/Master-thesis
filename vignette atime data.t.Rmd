@@ -30,7 +30,6 @@ library(readr)
 library(arrow)
 library(ggplot2)
 library(collapse)
-#library(sparklyr)
 library(polars)
 library(dplyr)
 library(plyr)
@@ -40,20 +39,6 @@ library(readxl)
 library(summarytools)
 library(psych)
 
-
-#library(sparklyr)
-
-#spark_install()
-
-
-#library(sparklyr)
-
-#sc <- spark_connect(master = "local")
-
-#options(sparklyr.log.console = TRUE)
-#sc <- spark_connect(master = "local")
-
-#sc <- spark_connect(master = "local")
 ```
 
 ```{r}
@@ -62,7 +47,6 @@ write.colors <- c(
   "data.table::fwrite"="#D6604D",
   "write_csv_arrow"="#BF812D",
   "polars::DataFrame_write_csv"="#F1EB90",
-  #"sparklyr::spark_write_csv" = "#722f37",
   "utils::write.csv"="deepskyblue")
 
 n.rows <- 100
@@ -76,7 +60,6 @@ atime.write.vary.cols <- atime::atime(
     input.vec <- rnorm(n.rows*N)
     input.mat <- matrix(input.vec, n.rows, N)
     input.df <- data.frame(input.mat)
-    #df <- copy_to(sc, input.df)
     
   },
   seconds.limit = seconds.limit,
@@ -93,9 +76,6 @@ atime.write.vary.cols <- atime::atime(
     
     pl$DataFrame(input.df)$write_csv(tempfile(fileext = ".csv"))
   },
-  #"write_csv_spark"={
-    #sparklyr::spark_write_csv(df, tempfile(fileext = ".csv"))
-  #},
   "utils::write.csv"= {
     utils::write.csv(input.df, tempfile())
   }
@@ -108,13 +88,11 @@ atime.write.vary.cols <- atime::atime(
 refs.write.vary.cols <- atime::references_best(atime.write.vary.cols)
 pred.write.vary.cols <- predict(refs.write.vary.cols)
 
-gg.write <- plot(pred.write.vary.cols)+
+csv_write_methods <- plot(pred.write.vary.cols)+
   theme(text=element_text(size=20))+
-  ggtitle(sprintf("Write real numbers to CSV, \n%d x N", n.rows))+
+  ggtitle(sprintf("Write real numbers to CSV,%d x N", n.rows))+
   scale_x_log10("N = number of columns to write")+
-  scale_y_log10("Computation time (seconds)
-median line, \nmin/max band
-over 10 timings")+
+  scale_y_log10("Computation time (seconds)")+
   facet_null()+
   scale_fill_manual(values=write.colors)+
   scale_color_manual(values=write.colors)
@@ -125,12 +103,12 @@ over 10 timings")+
 
 ```{r}
 
-print(gg.write)
-ggsave("gg.write.png", gg.write, width = 8, height = 5, units = "in", dpi = 200)
+print(csv_write_methods)
+ggsave("csv_write_methods.png", csv_write_methods, width = 8, height = 5, units = "in", dpi = 200)
 dev.off()
 
 
-gg.write
+csv_write_methods
 ```
 
 fread: fast CSV reader
@@ -140,7 +118,6 @@ read.colors <- c(
   "readr::read_csv\n(lazy=TRUE)"="#9970AB",
   "data.table::fread"="#D6604D",
   "read_csv_arrow"="#BF812D",
-  #"sparklyr::spark_read_csv"="#722f37",
   "polars::pl$read_csv"="#F1EB90",
   "utils::read.csv" = "deepskyblue")
 
@@ -168,8 +145,6 @@ atime.read.vary.cols <- atime::atime(
   "polars::pl$read_csv" = {
     polars::pl$read_csv(input.csv)
   },
-  #"sparklyr::spark_read_csv"= sparklyr::spark_read_csv(input.csv)
-  #},
   "utils::read.csv"=utils::read.csv(input.csv))
 ```
 
@@ -178,13 +153,11 @@ atime.read.vary.cols <- atime::atime(
 refs.read.vary.cols <- atime::references_best(atime.read.vary.cols)
 pred.read.vary.cols <- predict(refs.read.vary.cols)
 
-gg.read <- plot(pred.read.vary.cols)+
+csv_read_methods <- plot(pred.read.vary.cols)+
   theme(text=element_text(size=20))+
   ggtitle(sprintf("Read real numbers from CSV, %d x N", n.rows))+
   scale_x_log10("N = number of columns to read")+
-  scale_y_log10("Computation time (seconds)
-median line, min/max band
-over 10 timings")+
+  scale_y_log10("Computation time (seconds)")+
   facet_null()+
   scale_fill_manual(values=read.colors)+
   scale_color_manual(values=read.colors)
@@ -192,11 +165,11 @@ over 10 timings")+
 
 ```{r}
 
-print(gg.read)
-ggsave("gg.read.png", gg.read, width = 10, height = 6, units = "in", dpi = 300)
+print(csv_read_methods)
+ggsave("csv_read_methods.png", csv_read_methods, width = 10, height = 6, units = "in", dpi = 300)
 dev.off()
 
-gg.read
+csv_read_methods
 ```
 
 
@@ -268,13 +241,11 @@ ml.atime <- atime::atime(
 ```{r}
 ml.refs <- atime::references_best(ml.atime)
 ml.pred <- predict(ml.refs)
-ml.gg <- plot(ml.pred)+
+group_summary_methods <- plot(ml.pred)+
   theme(text=element_text(size=20))+
   ggtitle(sprintf("Mean,SD,Length over %d real numbers, N times", n.folds))+
   scale_x_log10("N = number of Mean,SD,Length to compute")+
-  scale_y_log10("Computation time (seconds)
-median line, min/max band
-over 10 timings")+
+  scale_y_log10("Computation time (seconds)")+
   facet_null()+
   scale_fill_manual(values=ml.colors)+
   scale_color_manual(values=ml.colors)
@@ -284,11 +255,11 @@ over 10 timings")+
 
 ```{r}
 
-print(ml.gg)
-ggsave("ml.gg.png", ml.gg, width = 10, height = 6, units = "in", dpi = 300)
+print(group_summary_methods)
+ggsave("group_summary_methods.png", group_summary_methods, width = 10, height = 6, units = "in", dpi = 300)
 dev.off()
 
-ml.gg
+group_summary_methods
 
 
 ```
@@ -356,13 +327,11 @@ ml.exp.colors <- c(
   "[.data.table(key)"="#D6604D",
   "[.data.table(no key)"="#B6604D",
   "stats::aggregate"="#4DB3E6")
-ml.exp.gg <- plot(ml.exp.pred)+
+expanded_summarization_by_group <- plot(ml.exp.pred)+
   theme(text=element_text(size=20))+
   ggtitle(sprintf("Mean,SD,Length over %d real numbers, N times", n.folds))+
   scale_x_log10("N = number of Mean,SD,Length to compute")+
-  scale_y_log10("Computation time (seconds)
-median line, min/max band
-over 10 timings")+
+  scale_y_log10("Computation time (seconds)")+
   facet_null()+
   scale_fill_manual(values=ml.exp.colors)+
   scale_color_manual(values=ml.exp.colors)
@@ -370,11 +339,11 @@ over 10 timings")+
 
 ```{r}
 
-print(ml.exp.gg)
-ggsave("ml.exp.gg.png", ml.exp.gg, width = 10, height = 6, units = "in", dpi = 300)
+print(expanded_summarization_by_group)
+ggsave("expanded_summarization_by_group.png", expanded_summarization_by_group, width = 10, height = 6, units = "in", dpi = 300)
 dev.off()
 
-ml.exp.gg
+expanded_summarization_by_group
 ```
 
 
@@ -387,7 +356,7 @@ ml.colors <- c(
   "stats::reshape"="#4DB3E6")
 
 
-ml.reshape.atime <- atime::atime(
+reshape_wide_to_long <- atime::atime(
   N=as.integer(10^seq(2, 15, by=0.5)),
   setup={
     df <- data.frame(
@@ -414,26 +383,24 @@ ml.reshape.atime <- atime::atime(
 ```
 
 ```{r}
-ml.reshape.refs <- atime::references_best(ml.reshape.atime)
-ml.reshape.pred <- predict(ml.reshape.refs)
-ml.reshape <- plot(ml.reshape.pred)+
+ml_reshape_wide_to_long_refs <- atime::references_best(reshape_wide_to_long)
+ml_reshape_wide_to_long_pred <- predict(ml_reshape_wide_to_long_refs)
+ml_reshape_wide_to_long <- plot(ml_reshape_wide_to_long_pred)+
   theme(text=element_text(size=17))+
   ggtitle(sprintf("Reshaping from wide to long over %dreal numbers, N times", n.folds))+
   scale_x_log10("N")+
-  scale_y_log10("Computation time (seconds)
-median line, min/max band
-over 10 timings")+
+  scale_y_log10("Computation time (seconds)")+
   facet_null()+
   scale_fill_manual(values=ml.colors)+
   scale_color_manual(values=ml.colors)
 ```
 
 ```{r}
-print(ml.reshape)
-ggsave("ml.reshape.png", ml.reshape, width = 10, height = 6, units = "in", dpi = 300)
+print(reshape_wide_to_long)
+ggsave("reshape_wide_to_long.png", reshape_wide_to_long, width = 10, height = 6, units = "in", dpi = 300)
 dev.off()
 
-ml.reshape
+reshape_wide_to_long
 ```
 
 
@@ -451,7 +418,7 @@ ml.colors<-c(
   "stats::reshape"="#4DB3E6")
 
 
-ml.wide.atime <- atime::atime(
+ml_reshape_long_to_wide <- atime::atime(
   N=as.integer(10^seq(2, 7, by=0.5)),
   
   setup={
@@ -479,15 +446,13 @@ ml.wide.atime <- atime::atime(
 ```
 
 ```{r}
-ml.wide.refs <- atime::references_best(ml.wide.atime)
-ml.wide.pred <- predict(ml.wide.refs)
-ml.wide <- plot(ml.wide.pred)+
+ml_reshape_long_to_wide_refs <- atime::references_best(ml_reshape_long_to_wide)
+ml_reshape_long_to_wide_pred <- predict(ml_reshape_long_to_wide_refs)
+ml_reshape_long_to_wide <- plot(ml_reshape_long_to_wide_pred)+
   theme(text=element_text(size=20))+
   ggtitle(sprintf("Reshaping from long to wide over \n%dreal numbers,N times", n.folds))+
   scale_x_log10("N")+
-  scale_y_log10("Computation time (seconds)
-median line, min/max band
-over 10 timings")+
+  scale_y_log10("Computation time (seconds)")+
   facet_null()+
   scale_fill_manual(values=ml.colors)+
   scale_color_manual(values=ml.colors)
@@ -495,149 +460,12 @@ over 10 timings")+
 
 ```{r}
 png()
-print(ml.wide)
-ggsave("ml.wide.png", ml.wide, width = 10, height = 6, units = "in", dpi = 300)
+print(ml_reshape_long_to_wide)
+ggsave("ml_reshape_long_to_wide.png", ml_reshape_long_to_wide, width = 10, height = 6, units = "in", dpi = 300)
 dev.off()
-
-ml.wide
+ml_reshape_long_to_wide
 ```
 
-
-
-creating data frame
-
-```{r}
-library(data.table)
-library(dplyr)
-library(atime)
-library(ggplot2)
-library(directlabels)
-
-ml.colors <- c(
-  "FAST" = "#D6604D",
-  "SLOW" = "#00FF00"
-  
-)
-```
-
-
-```{r}
-ml.create.atime <- atime::atime(
-  N = as.integer(10^seq(2, 7, by = 0.5)),
-  
-  FAST = {
-    dt <- data.table(
-      id = rep(1:N, each = 2),
-      category = rep(c("A", "B"), N),
-      value = rnorm(2 * N)
-    )
-  },
-  
-  SLOW = {
-    df <- tibble(
-      id = rep(1:N, each = 2),
-      category = rep(c("A", "B"), N),
-      value = rnorm(2 * N)
-    )
-  }
-)
-```
-
-
-```{r}
-ml.create.refs <- atime::references_best(ml.create.atime)
-ml.create.pred <- predict(ml.create.refs)
-ml.create <- plot(ml.create.pred) +
-  theme(text = element_text(size = 20)) +
-  ggtitle(sprintf("showing when a function is fast and \nwhen a function is Slow", n.folds)) +
-  scale_x_log10("N") +
-  scale_y_log10("Computation time (seconds)") +
-  facet_null() +
-  scale_fill_manual(values = ml.colors) +
-  scale_color_manual(values = ml.colors)
-```
-
-
-```{r}
-print(ml.create)
-ggsave("ml.create.png", ml.create, width = 6, height = 3, units = "in", dpi = 100)
-
-ml.create
-```
-
-
-
-
-
-
-
-
-
-
-
-fast and slow
-
-```{r}
-
-options(dplyr.summarise.inform=FALSE)
-n.folds <- 10
-ml.exp.atime <- atime::atime(
-  N=as.integer(10^seq(2, 7, by=0.5)),
-  setup={
-    loss.dt <- data.table(
-      name="loss", 
-      fold=rep(1:n.folds, each=2*N),
-      loss=rnorm(2*N*n.folds),
-      set=rep(c("subtrain","validation"),each=N),
-      epoch=1:N,
-      key=c("set","epoch","fold"))
-    },
-  seconds.limit=seconds.limit,
-  "FAST"={
-    loss.dt[, .(
-      loss_length=.N,
-      loss_mean=mean(loss),
-      loss_sd=sd(loss)
-    ), by=.(set, epoch)]
-  },
-  
-  "SLOW"={
-    loss.dt |> 
-      collapse::fgroup_by(set, epoch) |> 
-      collapse::fsummarise(
-        loss_length=length(loss),
-        loss_mean=mean(loss), 
-        loss_sd=sd(loss))
-  })
-
-```
-
-```{r}
-ml.exp.refs <- atime::references_best(ml.exp.atime)
-ml.exp.pred <- predict(ml.exp.refs)
-ml.exp.colors <- c(
-  "SLOW"="#5AAE61",
-  "FAST"="#D6604D")
-ml.exp.gg <- plot(ml.exp.pred)+
-  theme(text=element_text(size=20))+
-  ggtitle(sprintf("Test Example to show Slow and Fast for Comparative Benchmarking", n.folds))+
-  scale_x_log10("N")+
-  scale_y_log10("Computation time (seconds)
-median line, min/max band
-over 10 timings")+
-  facet_null()+
-  scale_fill_manual(values=ml.exp.colors)+
-  scale_color_manual(values=ml.exp.colors)
-```
-
-```{r}
-
-print(ml.exp.gg)
-
-ggsave("ml.exp.gg.png", ml.exp.gg, width = 10, height = 6, units = "in", dpi = 300)
-dev.off()
-
-```
 
 
 

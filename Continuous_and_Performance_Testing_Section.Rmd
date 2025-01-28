@@ -27,6 +27,16 @@ library(directlabels)
 ```
 
 ```{r}
+atime.colors.1 <- c(#RColorBrewer::brewer.pal(7, "Dark2")
+  Before="#66A61E",
+  Regression="#E6AB02", 
+  Fixed="#A6761D"
+)
+```
+
+
+
+```{r}
    atime.colors <- c(#RColorBrewer::brewer.pal(7, "Dark2")
       HEAD="#1B9E77",
       base="#D95F02",
@@ -90,17 +100,207 @@ atime.list.5427 <- atime::atime_versions(
 
 ```{r}
 
-png("atime.list.5427.png",res = 600, width = 5, height = 3, unit = "in")
-atime.list.5427 = ggplot()+
+png("data.table_atime_versions_5427.png",res = 600, width = 5, height = 3, unit = "in")
+data.table_atime_versions_5427 = ggplot()+
   geom_line(aes(x = N, y = median, group = expr.name, colour = expr.name), data =  atime.list.5427$measurements)+
   geom_ribbon(aes(x = N, ymin = min, ymax = max, fill = expr.name), data = atime.list.5427$measurements, alpha = 0.5 )+
   scale_x_log10("N = number of columns",limits = c(1e1, 1e8), breaks = 10^seq(1,7))+
   scale_y_log10("Computation Time (Seconds)")+
   scale_fill_manual(values=atime.colors.2)+
   scale_color_manual(values=atime.colors.2)
-directlabels::direct.label(atime.list.5427, list(cex = 1, "right.polygons"))
+directlabels::direct.label(data.table_atime_versions_5427, list(cex = 1, "right.polygons"))
 dev.off()
 ```
+
+
+```{r}
+atime.list.4646 <- atime::atime_versions(
+  pkg.path="C:/Users/amoak/data.table",
+  pkg.edit.fun=pkg.edit.fun,
+  N=10^seq(1,7),
+  setup={ 
+    n_nested = 40L
+    dt = data.table(id = seq_len(N),
+                    value = replicate(N, data.table(val1 = sample(n_nested)), simplify = FALSE))
+  },
+  
+  expr=data.table:::`[.data.table`(dt, , value[[1L]], by = id),
+  "Slow"="db618444a4d16b91cccf35d80fa3f306739dd571", 
+  "Fast"="ec041f78691f9f9495c0f25b78109cd3f5295f4f") 
+```
+
+
+
+```{r}
+
+png("data.table_atime_versions_4646.png",res = 600, width = 5, height = 3, unit = "in")
+data.table_atime_versions_4646 = ggplot()+
+  geom_line(aes(x = N, y = median, group = expr.name, colour = expr.name), data =  atime.list.4646$measurements)+
+  geom_ribbon(aes(x = N, ymin = min, ymax = max, fill = expr.name), data = atime.list.4646$measurements, alpha = 0.5 )+
+  scale_x_log10("N = number of columns",limits = c(1e1, 1e8), breaks = 10^seq(1,7))+
+  scale_y_log10("Computation Time (Seconds)")+
+  scale_fill_manual(values=atime.colors.2)+
+  scale_color_manual(values=atime.colors.2)
+directlabels::direct.label(data.table_atime_versions_4646, list(cex = 1, "right.polygons"))
+dev.off()
+```
+
+
+
+
+```{r}
+
+atime.list.5424 <- atime::atime_versions(
+  pkg.path="C:/Users/amoak/data.table",
+  pkg.edit.fun=pkg.edit.fun,
+  N=10^seq(3,8),
+  setup={ 
+    n <- N/100
+    set.seed(1L)
+    dt <- data.table(
+      g = sample(seq_len(n), N, TRUE),
+      x = runif(N),
+      key = "g")
+    dt_mod <- copy(dt)
+  },
+  expr=data.table:::`[.data.table`(dt_mod, , N := .N, by = g),
+  "Before"="be2f72e6f5c90622fe72e1c315ca05769a9dc854",
+  "Regression"="e793f53466d99f86e70fc2611b708ae8c601a451", 
+  "Fixed"="58409197426ced4714af842650b0cc3b9e2cb842") 
+
+```
+
+
+
+
+```{r}
+
+png("data.table_atime_versions_5424.png",res = 600, width = 5, height = 3, unit = "in")
+data.table_atime_versions_5424 = ggplot()+
+  geom_line(aes(x = N, y = median, group = expr.name, colour = expr.name), data =  atime.list.5424$measurements)+
+  geom_ribbon(aes(x = N, ymin = min, ymax = max, fill = expr.name), data = atime.list.5424$measurements, alpha = 0.5 )+
+  scale_x_log10("N = number of columns",limits = c(1e1, 1e8), breaks = 10^seq(1,7))+
+  scale_y_log10("Computation Time (Seconds)")+
+  scale_fill_manual(values=atime.colors.1)+
+  scale_color_manual(values=atime.colors.1)
+directlabels::direct.label(data.table_atime_versions_5424, list(cex = 1, "right.polygons"))
+dev.off()
+```
+
+
+
+
+```{r}
+atime.list.4386 <- atime::atime_versions( 
+  pkg.path="C:/Users/amoak/data.table",
+  pkg.edit.fun=pkg.edit.fun,
+  N=10^seq(1,20),
+  setup={ 
+    set.seed(108)
+    d <- data.table(
+      id3 = sample(c(seq.int(N*0.9), sample(N*0.9, N*0.1, TRUE))),
+      v1 = sample(5L, N, TRUE),
+      v2 = sample(5L, N, TRUE))
+  },
+
+  expr=data.table:::`[.data.table`(d, , (max(v1)-min(v2)), by = id3),
+"Slow"="b1b1832b0d2d4032b46477d9fe6efb15006664f4",
+"Fast"="8bf5b5c4afa8e8fac8d55bcbd131463a80bb49fd")
+```
+
+
+
+
+```{r}
+
+png("data.table_atime_versions_4386.png",res = 600, width = 5, height = 3, unit = "in")
+data.table_atime_versions_4386 = ggplot()+
+  geom_line(aes(x = N, y = median, group = expr.name, colour = expr.name), data =  atime.list.4386$measurements)+
+  geom_ribbon(aes(x = N, ymin = min, ymax = max, fill = expr.name), data = atime.list.4386$measurements, alpha = 0.5 )+
+  scale_x_log10("N = number of columns",limits = c(1e1, 1e8), breaks = 10^seq(1,7))+
+  scale_y_log10("Computation Time (Seconds)")+
+  scale_fill_manual(values=atime.colors.2)+
+  scale_color_manual(values=atime.colors.2)
+directlabels::direct.label(data.table_atime_versions_4386, list(cex = 1, "right.polygons"))
+dev.off()
+```
+
+
+
+```{r}
+
+atime.list.4440 <- atime::atime_versions(
+  pkg.path="C:/Users/amoak/data.table",
+  pkg.edit.fun=pkg.edit.fun,
+  N= 10^seq(3,8),
+  setup={
+    set.seed(1L)
+    dt <- data.table(
+      a=sample(N,N))
+    setindex(dt, a)
+  },
+  
+  expr=data.table:::shallow(dt), 
+  "Slow"="b1b1832b0d2d4032b46477d9fe6efb15006664f4",
+  "Fast"="40f9165a265f68b87ffb3cb00efbaa9540c2dcb8")
+
+
+```
+
+
+
+```{r}
+
+png("data.table_atime_versions_4440.png",res = 600, width = 5, height = 3, unit = "in")
+data.table_atime_versions_4440 = ggplot()+
+  geom_line(aes(x = N, y = median, group = expr.name, colour = expr.name), data =  atime.list.4440$measurements)+
+  geom_ribbon(aes(x = N, ymin = min, ymax = max, fill = expr.name), data = atime.list.4440$measurements, alpha = 0.5 )+
+  scale_x_log10("N = number of columns",limits = c(1e1, 1e8), breaks = 10^seq(1,7))+
+  scale_y_log10("Computation Time (Seconds)")+
+  scale_fill_manual(values=atime.colors.2)+
+  scale_color_manual(values=atime.colors.2)
+directlabels::direct.label(data.table_atime_versions_4440, list(cex = 1, "right.polygons"))
+dev.off()
+```
+
+
+
+
+```{r}
+
+atime.list.1534 <- atime::atime_versions(
+  pkg.path="C:/Users/amoak/data.table",
+  pkg.edit.fun=pkg.edit.fun,
+  N=10^seq(1,7),
+  setup={ 
+    DT = data.table(x = sample(N), y = sample(1e2,N,TRUE))
+  },
+  expr=data.table:::`[.data.table`(DT,, shift(x, 1, type="lag"), y),
+  "Slow"="7f0ce147eef1dd5cd5ff05dffc3c72f472bcde51", 
+  "Fast"="a6abac319446ae7dde8bc4501fae40eeb5cc228c")
+```
+
+
+
+
+
+```{r}
+
+png("data.table_atime_versions_1534.png",res = 600, width = 5, height = 3, unit = "in")
+data.table_atime_versions_1534 = ggplot()+
+  geom_line(aes(x = N, y = median, group = expr.name, colour = expr.name), data =  atime.list.1534$measurements)+
+  geom_ribbon(aes(x = N, ymin = min, ymax = max, fill = expr.name), data = atime.list.1534$measurements, alpha = 0.5 )+
+  scale_x_log10("N = number of columns",limits = c(1e1, 1e8), breaks = 10^seq(1,7))+
+  scale_y_log10("Computation Time (Seconds)")+
+  scale_fill_manual(values=atime.colors.2)+
+  scale_color_manual(values=atime.colors.2)
+directlabels::direct.label(data.table_atime_versions_1534, list(cex = 1, "right.polygons"))
+dev.off()
+```
+
+
+
+
 
 
 
@@ -126,15 +326,15 @@ atime.result <- atime::atime_versions(
 
 
 ```{r}
-png("GitHub.action.test.png", res = 600, width = 5, height = 3, unit = "in")
-GitHub.action.test = ggplot() +
+png("data.table-atime_test.png", res = 600, width = 5, height = 3, unit = "in")
+data.table-atime_test = ggplot() +
   geom_line(aes(x = N, y = median, group = expr.name, colour = expr.name), data = atime.result$measurements) +
   geom_ribbon(aes(x = N, ymin = min, ymax = max, fill = expr.name), data = atime.result$measurements, alpha = 0.5) +
   scale_x_log10("N = number of columns", limits = c(NA, 1e8),breaks = c(1, 10, 100, 1000, 10000, 100000, 1e6, 1e7)) +
   scale_y_log10("Computation Time (Seconds)")+
   scale_fill_manual(values=atime.colors)+
   scale_color_manual(values=atime.colors)
-directlabels::direct.label(GitHub.action.test, list(cex = 1, "right.polygons")) 
+directlabels::direct.label(data.table-atime_test, list(cex = 1, "right.polygons")) 
 dev.off()
 ```
 

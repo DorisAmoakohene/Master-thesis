@@ -1,0 +1,15 @@
+\documentclass{article}
+\usepackage{Sweave}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+This is an example of an Rnw document.
+
+<<example_chunk>>=
+# R code goes here
+x <- 1:10
+mean(x)
+@
+
+\end{document}
