@@ -45,7 +45,7 @@ atime.list
 #atime.list$measurements$kilobytes = NA
 atime.list$unit.col.vec<-c(seconds = "median")
 
-png("atime.list.png",res = 300, width = 5, height = 3, unit = "in")
+png("create_subject_pattern_atime.png",res = 300, width = 5, height = 3, unit = "in")
 plot(atime.list)+
   scale_y_log10("Computation Time (seconds)")+
   facet_null()
@@ -62,7 +62,7 @@ d = plot(best.list) +
   scale_y_log10("Computation Time (seconds)") +
   facet_wrap(~ expr.name, labeller = labeller(expr.name = function(x) gsub("seconds", "", x)))
   
-ggsave("best.list.plot.png", plot = d, width = 5, height = 3, unit = "in", dpi = 300)
+ggsave("create_subject_pattern_best.png", plot = d, width = 5, height = 3, unit = "in", dpi = 300)
 ```
 
 
@@ -76,7 +76,7 @@ f = plot(pred.list) +
   scale_x_log10(name = "N = number of columns", limits = c(1, 100)) +
   facet_null()
 
-ggsave("pred.list.plot.png", plot = f, width = 5, height = 3, unit = "in", dpi = 300)
+ggsave("create_subject_pattern_pred.png", plot = f, width = 5, height = 3, unit = "in", dpi = 300)
 
 ```
 
