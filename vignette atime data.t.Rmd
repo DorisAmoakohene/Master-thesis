@@ -60,7 +60,7 @@ atime.write.vary.cols <- atime::atime(
     input.vec <- rnorm(n.rows*N)
     input.mat <- matrix(input.vec, n.rows, N)
     input.df <- data.frame(input.mat)
-    
+    pl <- polars::pl
   },
   seconds.limit = seconds.limit,
   "data.table::fwrite"={
@@ -73,7 +73,6 @@ atime.write.vary.cols <- atime::atime(
     readr::write_csv(input.df, tempfile(), progress = FALSE)
   },
   "polars::DataFrame_write_csv"={
-    
     pl$DataFrame(input.df)$write_csv(tempfile(fileext = ".csv"))
   },
   "utils::write.csv"= {
@@ -99,7 +98,9 @@ csv_write_methods <- plot(pred.write.vary.cols)+
 
 
 
+
 ```
+
 
 ```{r}
 
@@ -396,11 +397,11 @@ ml_reshape_wide_to_long <- plot(ml_reshape_wide_to_long_pred)+
 ```
 
 ```{r}
-print(reshape_wide_to_long)
-ggsave("reshape_wide_to_long.png", reshape_wide_to_long, width = 10, height = 6, units = "in", dpi = 300)
+print(ml_reshape_wide_to_long)
+ggsave("ml_reshape_wide_to_long.png", ml_reshape_wide_to_long, width = 10, height = 6, units = "in", dpi = 300)
 dev.off()
 
-reshape_wide_to_long
+ml_reshape_wide_to_long
 ```
 
 

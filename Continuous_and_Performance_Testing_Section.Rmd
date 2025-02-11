@@ -232,7 +232,7 @@ dev.off()
 atime.list.4440 <- atime::atime_versions(
   pkg.path="C:/Users/amoak/data.table",
   pkg.edit.fun=pkg.edit.fun,
-  N= 10^seq(3,8),
+  N= 10^seq(1,8),
   setup={
     set.seed(1L)
     dt <- data.table(
@@ -255,7 +255,7 @@ png("data.table_atime_versions_4440.png",res = 600, width = 5, height = 3, unit 
 data.table_atime_versions_4440 = ggplot()+
   geom_line(aes(x = N, y = median, group = expr.name, colour = expr.name), data =  atime.list.4440$measurements)+
   geom_ribbon(aes(x = N, ymin = min, ymax = max, fill = expr.name), data = atime.list.4440$measurements, alpha = 0.5 )+
-  scale_x_log10("N = number of columns",limits = c(1e1, 1e8), breaks = 10^seq(1,7))+
+  scale_x_log10("N = number of columns",limits = c(1e1, 1e9), breaks = 10^seq(1,9))+
   scale_y_log10("Computation Time (Seconds)")+
   scale_fill_manual(values=atime.colors.2)+
   scale_color_manual(values=atime.colors.2)
@@ -326,15 +326,15 @@ atime.result <- atime::atime_versions(
 
 
 ```{r}
-png("data.table-atime_test.png", res = 600, width = 5, height = 3, unit = "in")
-data.table-atime_test = ggplot() +
+png("data.table_atime_test.png", res = 600, width = 5, height = 3, unit = "in")
+data.table_atime_test = ggplot() +
   geom_line(aes(x = N, y = median, group = expr.name, colour = expr.name), data = atime.result$measurements) +
   geom_ribbon(aes(x = N, ymin = min, ymax = max, fill = expr.name), data = atime.result$measurements, alpha = 0.5) +
   scale_x_log10("N = number of columns", limits = c(NA, 1e8),breaks = c(1, 10, 100, 1000, 10000, 100000, 1e6, 1e7)) +
   scale_y_log10("Computation Time (Seconds)")+
   scale_fill_manual(values=atime.colors)+
   scale_color_manual(values=atime.colors)
-directlabels::direct.label(data.table-atime_test, list(cex = 1, "right.polygons")) 
+directlabels::direct.label(data.table_atime_test, list(cex = 1, "right.polygons")) 
 dev.off()
 ```
 
