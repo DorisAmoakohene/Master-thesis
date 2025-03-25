@@ -7,9 +7,6 @@ date: "2024-02-22"
 
 
 
-
-
-
 ## Libraries
 
 ```{r setup,warning=FALSE,message=FALSE}
@@ -23,6 +20,49 @@ virtualenv_create("fm-proj")
 use_virtualenv("fm-proj", required = F)
 
 ```
+
+
+
+```{r}
+atime.overhead <- atime::atime(
+  N = as.integer(10^seq(2, 10, by = 0.2)),
+  overhead = {
+    reticulate::py_run_string("x = 5")
+  }
+)
+atime.overhead$unit.col.vec <- c(seconds="median")
+plot(atime.overhead)
+
+(overhead.seconds <- median(atime.overhead$measurements$median))
+```
+
+
+```{r}
+atime.overhead <- atime::atime(
+  N = 10^seq(2, 10, by = 0.2),  
+  overhead = {
+    reticulate::py_run_string("x = 5")
+  }
+)
+atime.overhead$unit.col.vec <- c(seconds = "median")
+plot(atime.overhead)
+```
+
+
+```{r}
+png("atime_overhead.png", res = 600, width = 5, height = 3, unit = "in") 
+plot(atime.overhead)  
+dev.off()
+```
+
+
+
+```{r}
+# Compute overhead in seconds
+(overhead.seconds <- median(atime.overhead$measurements$median, na.rm = TRUE))
+
+```
+
 
 
 ```{python}
@@ -66,7 +106,7 @@ plot(pred.write.vary.cols)
 ```
 
 ```{r}
-csv_write_method_pd_dt <- plot(pred.write.vary.cols) +
+csv_write_methods_pandas_data.table <- plot(pred.write.vary.cols) +
   theme(text = element_text(size = 15)) +
   ggtitle(sprintf("Write real numbers to CSV, with \npandas in Python and data.table in R, \n%d x N", n.rows)) +
   scale_x_log10("N = number of columns to write") +
@@ -75,13 +115,13 @@ csv_write_method_pd_dt <- plot(pred.write.vary.cols) +
   scale_fill_manual(values = write.colors) +
   scale_color_manual(values = write.colors)
 
-print(csv_write_method_pd_dt)
+print(csv_write_methods_pandas_data.table)
 ```
 
 ```{r}
 png()
-print(csv_write_method_pd_dt)
-ggsave("csv_write_method_pd_dt.png", csv_write_method_pd_dt, width = 10, height = 6, units = "in", dpi = 300)
+print(csv_write_methods_pandas_data.table)
+ggsave("csv_write_methods_pandas_data.table.png", csv_write_methods_pandas_data.table, width = 10, height = 6, units = "in", dpi = 300)
 dev.off()
 ```
 
@@ -132,7 +172,7 @@ plot(pred.read.vary.cols)
 
 
 ```{r,warning=FALSE,message=FALSE}
-csv_read_method_pd_dt <- plot(pred.read.vary.cols)+
+csv_read_methods_pandas_data.table <- plot(pred.read.vary.cols)+
   theme(text=element_text(size=15))+
   ggtitle(sprintf("Read real numbers to CSV, with \npandas in Python and data.table in R, \n%d x N", n.rows))+
   scale_x_log10("N = number of columns to read")+
@@ -145,14 +185,14 @@ over 10 timings")+
 ```
 
 ```{r,warning=FALSE,message=FALSE}
-plot(csv_read_method_pd_dt)
+plot(csv_read_methods_pandas_data.table)
 
 png()
-print(csv_read_method_pd_dt)
-ggsave("csv_read_method_pd_dt.png", csv_read_method_pd_dt, width = 10, height = 6, units = "in", dpi = 300)
+print(csv_read_methods_pandas_data.table)
+ggsave("csv_read_methods_pandas_data.table.png", csv_read_methods_pandas_data.table, width = 10, height = 6, units = "in", dpi = 300)
 dev.off()
 
-csv_read_method_pd_dt
+csv_read_methods_pandas_data.table
 ```
 
 Reshape
@@ -204,7 +244,7 @@ plot(ml.reshape.pred)
 
 
 ```{r,warning=FALSE,message=FALSE}
-ml.reshape.wide_long_pd.dt<- plot(ml.reshape.pred)+
+ml_reshape_wide_to_long_pandas_data.table <- plot(ml.reshape.pred)+
   theme(text=element_text(size=15))+
   ggtitle(sprintf("Reshaping from wide to long, comparing \npandas & data.table over real numbers, N times", n.folds))+
   scale_x_log10("N")+
@@ -217,14 +257,14 @@ over 10 timings")+
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-plot(ml.reshape.wide_long_pd.dt)
+plot(ml_reshape_wide_to_long_pandas_data.table)
 
 png()
-print(ml.reshape.wide_long_pd.dt)
-ggsave("ml.reshape.wide_long_pd.dt.png", ml.reshape.wide_long_pd.dt, width = 10, height = 6, units = "in", dpi = 300)
+print(ml_reshape_wide_to_long_pandas_data.table)
+ggsave("ml_reshape_wide_to_long_pandas_data.table.png", ml_reshape_wide_to_long_pandas_data.table, width = 10, height = 6, units = "in", dpi = 300)
 dev.off()
 
-ml.reshape.wide_long_pd.dt
+ml_reshape_wide_to_long_pandas_data.table
 ```
 
 
@@ -279,9 +319,9 @@ plot(ml.long2wide.pred)
 
 
 ```{r,warning=FALSE,message=FALSE}
-ml.reshape.long_wide_pd.dt <- plot(ml.long2wide.pred)+
+ml_reshape_long_to_wide_pandas_data.table <- plot(ml.long2wide.pred)+
   theme(text=element_text(size=15))+
-  ggtitle(sprintf("Reshaping from long to wide, comparing \npandas & data.table over real numbers, N times", n.folds))+
+  ggtitle(sprintf("Reshaping from long to wide, comparing pandas & data.table \nover real numbers, N times", n.folds))+
   scale_x_log10("N")+
   scale_y_log10("Computation time (seconds)
 median line, min/max band
@@ -294,44 +334,14 @@ over 10 timings")+
 
 
 ```{r,warning=FALSE,message=FALSE}
-plot(ml.reshape.long_wide_pd.dt)
+plot(ml_reshape_long_to_wide_pandas_data.table)
 
-ggsave("ml.reshape.long_wide_pd.dt.png", ml.reshape.long_wide_pd.dt, width = 10, height = 6, units = "in", dpi = 300)
+ggsave("ml_reshape_long_to_wide_pandas_data.table.png", ml_reshape_long_to_wide_pandas_data.table, width = 10, height = 6, units = "in", dpi = 300)
 
 png()
-print(ml.reshape.long_wide_pd.dt)
-ggsave("ml.reshape.long_wide_pd.dt.png",ml.reshape.long_wide_pd.dt, width = 10, height = 6, units = "in", dpi = 300)
+print(ml_reshape_long_to_wide_pandas_data.table)
+ggsave("ml_reshape_long_to_wide_pandas_data.table.png",ml_reshape_long_to_wide_pandas_data.table, width = 10, height = 6, units = "in", dpi = 300)
 dev.off()
 
-ml.reshape.long_wide_pd.dt
+ml_reshape_long_to_wide_pandas_data.table
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
